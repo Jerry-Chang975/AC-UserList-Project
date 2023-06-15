@@ -10,54 +10,53 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
+    />
     <link rel="stylesheet" href="style.css" />
     <title>User List</title>
   </head>
 
   <body>
     <!--   navigation -->
-    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar fixed-top navbar-expand-sm navbar-light bg-light">
       <div class="container-fluid">
         <a class="navbar-brand" href="./index.html">User List</a>
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
+          data-bs-target="#navbarToggler"
+          aria-controls="navbarToggler"
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
+        <div class="collapse navbar-collapse" id="navbarToggler">
+          <ul class="navbar-nav me-auto">
             <li class="nav-item">
               <a class="nav-link" href="#">Favorite</a>
             </li>
           </ul>
+          <label class="m-2 text-light" for="colorMode">Light</label>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="colorMode"
+            />
+            <label class="form-check-label text-dark" for="colorMode"
+              >Dark</label
+            >
+          </div>
         </div>
       </div>
     </nav>
     <!--   data panel -->
     <div class="container">
-      <div class="row" style="margin: 1rem">
-        <form class="row gx-3 gy-2 align-items-center">
-          <div class="col-sm-3">
-            <input
-              type="text"
-              class="form-control"
-              id="user-search-input"
-              placeholder="search..."
-            />
-          </div>
-          <div class="col-auto">
-            <button type="submit" id="user-search-btn" class="btn btn-primary">
-              Search
-            </button>
-          </div>
-        </form>
-      </div>
       <div class="row">
         <div
           class="container d-flex flex-wrap justify-content-center"
@@ -68,6 +67,11 @@
       </div>
     </div>
 
+    <!-- pagination -->
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center"></ul>
+    </nav>
+
     <!--   user detail modal -->
     <div
       class="modal fade"
@@ -77,7 +81,7 @@
       aria-hidden="true"
     >
       <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div id="modalColor" class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="modal-user-title">Modal title</h1>
             <button
@@ -90,7 +94,7 @@
           <div class="modal-body">
             <div class="container-fluid">
               <div class="row">
-                <div class="col-6">
+                <div class="col-5">
                   <img
                     src=""
                     class="img-fluid"
@@ -98,7 +102,7 @@
                     id="modal-user-img"
                   />
                 </div>
-                <div class="col-6" id="modal-user-detail"></div>
+                <div class="col-7" id="modal-user-detail"></div>
               </div>
             </div>
           </div>
@@ -120,6 +124,6 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-    <script src="script.js"></script>
+    <script src="favorite.js"></script>
   </body>
 </html>

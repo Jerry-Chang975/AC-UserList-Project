@@ -2,9 +2,10 @@ const BASE_URL = 'https://user-list.alphacamp.io';
 const INDEX_URL = BASE_URL + '/api/v1/users/';
 const dataPanel = document.querySelector('#data-panel');
 const searchInput = document.querySelector('#user-search-input');
-const searchBtn = document.querySelector('#user-search-btn');
 const pagination = document.querySelector('.pagination');
-let pageCount = 12;
+const colorSwitch = document.querySelector('#colorMode');
+let pageCount = 20;
+let totalPages;
 
 const userList = [];
 
@@ -13,9 +14,16 @@ function renderUserList(data) {
   favoriteList;
   let rawHTML = ``;
   data.forEach((user) => {
-    rawHTML += `
-      <div class="card m-3" style="width: 12rem" data-user-id="${user.id}">
+    if (colorSwitch.checked) {
+      rawHTML += `
+      <div class="card m-3 bg-dark text-light" data-user-id="${user.id}">
     `;
+    } else {
+      rawHTML += `
+      <div class="card m-3" data-user-id="${user.id}">
+    `;
+    }
+
     if (favoriteList.some((favUser) => favUser.id === user.id)) {
       rawHTML += `
           <i class="heart fa fa-heart fa-lg m-2" data-user-id="${user.id}"></i>
@@ -67,19 +75,34 @@ function renderUserModal(userId) {
   `;
 }
 
-function renderPagination(curPage, totalPages) {
+function renderPagination(curPage, dataList) {
+  totalPages = Math.ceil(dataList.length / pageCount);
   rawHTML = ``;
   for (let i = 0; i < totalPages; i++) {
     if (i + 1 == curPage) {
-      rawHTML += `
+      if (colorSwitch.checked) {
+        rawHTML += `
+        <li class="page-item">
+          <a class="page-link active-dark" href="">${i + 1}</a>
+        </li>`;
+      } else {
+        rawHTML += `
         <li class="page-item active">
           <a class="page-link" href="">${i + 1}</a>
         </li>`;
+      }
     } else {
-      rawHTML += `
+      if (colorSwitch.checked) {
+        rawHTML += `
+        <li class="page-item">
+          <a class="page-link dark-bg" href="">${i + 1}</a>
+        </li>`;
+      } else {
+        rawHTML += `
         <li class="page-item">
           <a class="page-link" href="">${i + 1}</a>
         </li>`;
+      }
     }
   }
   pagination.innerHTML = rawHTML;
@@ -117,10 +140,17 @@ function userCardEvent() {
     if (event.target.tagName === 'I') {
       event.target.classList.toggle('fa-heart-o');
       // add to favorite
+      event.target.parentElement.classList.add('shock');
+
       addToFavorite(userId);
     }
     if (userId) {
       renderUserModal(userId);
+    }
+  });
+  dataPanel.addEventListener('animationend', (event) => {
+    if (event.target.classList.contains('card')) {
+      event.target.classList.remove('shock');
     }
   });
 }
@@ -136,45 +166,76 @@ function searchEvent() {
     const keyword = event.target.value.trim();
     // filter the users
     const searchList = searchUserList(keyword, userList);
-    const totalPages = Math.ceil(searchList.length / 12);
+    totalPages = Math.ceil(searchList.length / pageCount);
     // rerender the page
     renderUserList(getPageUserData(searchList, 1));
-    renderPagination(1, totalPages);
-    paginationEvent(searchList, totalPages);
+    renderPagination(1, searchList);
+    paginationEvent(searchList);
   });
-  
 }
 
-function paginationEvent(dataList, totalPages) {
+function paginationEvent(dataList) {
   pagination.addEventListener('click', (event) => {
     event.preventDefault();
     if (event.target.tagName === 'A') {
       const curPage = parseInt(event.target.textContent);
       renderUserList(getPageUserData(dataList, curPage));
-      renderPagination(curPage, totalPages);
+      renderPagination(curPage, dataList);
     }
   });
 }
 
-axios
-  .get(INDEX_URL)
-  .then((res) => {
-    // get user data
-    userList.push(...res.data.results);
-    const totalPages = Math.ceil(userList.length / pageCount);
-    // render user
-    renderUserList(getPageUserData(userList, 1));
+async function main() {
+    // color mode
+  if (localStorage.getItem('colorMode') === 'dark') {
+    colorSwitch.click();
+  }
 
-    // pagination
-    renderPagination(1, totalPages);
-    paginationEvent(userList, totalPages);
+  // get user data
+  const res = await axios.get(INDEX_URL);
+  userList.push(...res.data.results);
 
-    // search event
-    searchEvent();
+  totalPages = Math.ceil(userList.length / pageCount);
+  // render user
+  renderUserList(getPageUserData(userList, 1));
 
-    // add show user event
-    userCardEvent();
-  })
-  .catch((err) => {
-    console.log(err);
+  // pagination
+  renderPagination(1, userList);
+  paginationEvent(userList, totalPages);
+
+  // search event
+  searchEvent();
+
+  // add show user event
+  userCardEvent();
+}
+
+colorSwitch.addEventListener('input', (event) => {
+  const nav = document.querySelector('nav.navbar');
+  const modal = document.querySelector('#modalColor');
+  const cards = document.querySelectorAll('div.card');
+  const pages = document.querySelectorAll('a.page-link');
+  const body = document.querySelector('body');
+
+  body.classList.toggle('dark-bg');
+  nav.classList.toggle('navbar-dark');
+  nav.classList.toggle('bg-dark');
+  modal.classList.toggle('bg-dark');
+  modal.classList.toggle('text-light');
+  cards.forEach((card) => {
+    card.classList.toggle('bg-dark');
+    card.classList.toggle('text-light');
   });
+  pages.forEach((page) => {
+    page.classList.toggle('dark-bg');
+  });
+
+  // save to localStorage
+  if (colorSwitch.checked) {
+    localStorage.setItem('colorMode', 'dark');
+  } else {
+    localStorage.setItem('colorMode', 'light');
+  }
+});
+
+main();
