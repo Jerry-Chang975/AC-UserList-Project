@@ -8,7 +8,7 @@ let totalPages;
 function renderUserList(data) {
   let rawHTML = ``;
   data.forEach((user) => {
-    if (colorSwitch.checked) {
+    if (!colorSwitch.checked) {
       rawHTML += `<div class="card m-3 bg-dark text-light" data-user-id="${user.id}">`;
     } else {
       rawHTML += `<div class="card m-3" data-user-id="${user.id}">`;
@@ -60,7 +60,7 @@ function renderPagination(curPage) {
   rawHTML = ``;
   for (let i = 0; i < totalPages; i++) {
     if (i + 1 == curPage) {
-      if (colorSwitch.checked) {
+      if (!colorSwitch.checked) {
         rawHTML += `
         <li class="page-item active">
           <a class="page-link" href="">${i + 1}</a>
@@ -72,7 +72,7 @@ function renderPagination(curPage) {
         </li>`;
       }
     } else {
-      if (colorSwitch.checked) {
+      if (!colorSwitch.checked) {
         rawHTML += `
         <li class="page-item">
           <a class="page-link dark-bg" href="">${i + 1}</a>
@@ -176,7 +176,7 @@ colorSwitch.addEventListener('input', (event) => {
   });
 
   // save to localStorage
-  if (colorSwitch.checked) {
+  if (!colorSwitch.checked) {
     localStorage.setItem('colorMode', 'dark');
   } else {
     localStorage.setItem('colorMode', 'light');
